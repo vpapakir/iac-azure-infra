@@ -68,6 +68,18 @@ iac-azure-infra/
 - **Depends on**: Staging deployment success
 - **Requires**: Manual approval
 
+## Pipeline Stages
+
+### Planning (All Environments)
+- **Trigger**: Every push
+- **Environments**: Dev, staging, prod
+- **Shows**: What would change in each environment
+
+### Apply Rules
+- **Dev**: Any branch with `[apply]`
+- **Staging/Prod**: Main branch only with `[apply]`
+- **Requires**: Manual approval for production
+
 ## Usage
 
 ### Planning Changes (Every Push)
