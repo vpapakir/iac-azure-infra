@@ -4,7 +4,7 @@ terraform {
     organization = "vpapakir"
 
     workspaces {
-      prefix = "azure-infra-"
+      name = "azure-infra-dev"
     }
   }
   required_providers {
