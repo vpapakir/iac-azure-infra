@@ -1,13 +1,19 @@
-resource_group_name = "rg-weu-dev-datalake-001"
-location           = "West Europe"
-data_factory_name  = "adf-weu-dev-datalake-001"
+resource_group_name_datalake = "rg-weu-dev-datalake-001"
+location_datalake            = "West Europe"
 
-data_factory_public_network_enabled = true
-data_factory_managed_vnet_enabled   = true
-
-tags = {
+tags_datalake = {
   Environment = "dev"
   Project     = "datalake"
+  Owner       = "platform-team"
+  CostCenter  = "engineering"
+}
+
+resource_group_name_gen = "rg-weu-dev-gen-001"
+location_gen            = "West Europe"
+
+tags_gen      = {
+  Environment = "dev"
+  Project     = "gen"
   Owner       = "platform-team"
   CostCenter  = "engineering"
 }
