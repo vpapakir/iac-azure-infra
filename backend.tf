@@ -6,9 +6,4 @@ terraform {
       version = "~> 3.0"
     }
   }
-  
-  cloud {
-    organization = "vpapakir"
-    # Workspace will be specified via backend config files
-  }
 }
