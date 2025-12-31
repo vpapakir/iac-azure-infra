@@ -23,5 +23,5 @@ module "resourcegroup_gen" {
 
   name     = var.resource_group_name_gen
   location = var.location_gen
-  tags     = var.tags_datalake_gen
+  tags     = var.tags_gen
 }
