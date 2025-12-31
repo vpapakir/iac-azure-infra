@@ -1,24 +1,14 @@
 # Azure Infrastructure Consumer
 # Consumes published atoms from Terraform Cloud registry
 
-terraform {
-  required_version = ">= 1.6.0"
-  required_providers {
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = "~> 3.0"
-    }
-  }
-}
-
 provider "azurerm" {
   features {}
 }
 
 # Resource Group using published atom
-module "resource_group" {
-  source  = "app.terraform.io/vpapakir/resourcegroup/azure"
-  version = "~> 0.0.1"
+module "resourcegroup" {
+  source  = "app.terraform.io/vpapakir/resourcegroup/atom"
+  version = "0.0.1"
 
   name     = var.resource_group_name
   location = var.location

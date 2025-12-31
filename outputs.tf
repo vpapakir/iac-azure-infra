@@ -1,16 +1,16 @@
 output "resource_group_id" {
   description = "ID of the created resource group"
-  value       = module.resource_group.id
+  value       = module.resourcegroup.id
 }
 
 output "resource_group_name" {
   description = "Name of the created resource group"
-  value       = module.resource_group.name
+  value       = module.resourcegroup.name
 }
 
 output "resource_group_location" {
   description = "Location of the created resource group"
-  value       = module.resource_group.location
+  value       = module.resourcegroup.location
 }
 
 # Data Factory outputs (when module is enabled)
