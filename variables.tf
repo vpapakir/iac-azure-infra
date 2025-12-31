@@ -1,15 +1,15 @@
-variable "resource_group_name_datalake" {
+variable "resource_group_name_api" {
   description = "Name of the Azure resource group"
   type        = string
 }
 
-variable "location_datalake" {
+variable "location_api" {
   description = "Azure region for resources"
   type        = string
   default     = "West Europe"
 }
 
-variable "tags_datalake" {
+variable "tags_api" {
   description = "Tags to apply to all resources"
   type        = map(string)
   default     = {}
