@@ -4,7 +4,7 @@ location_intg            = "West Europe"
 tags_intg = {
   Environment = "dev"
   Project     = "intg"
-  Owner       = "platform-team"
+  Owner       = "platform team"
   CostCenter  = "engineering"
 }
 
@@ -14,6 +14,6 @@ location_gen            = "West Europe"
 tags_gen      = {
   Environment = "dev"
   Project     = "gen"
-  Owner       = "platform-team"
+  Owner       = "platform team"
   CostCenter  = "engineering"
 }
