@@ -1,9 +1,9 @@
-resource_group_name_api = "rg-weu-dev-datalake-001"
+resource_group_name_api = "rg-weu-dev-api-001"
 location_api            = "West Europe"
 
 tags_api = {
   Environment = "dev"
-  Project     = "datalake"
+  Project     = "api"
   Owner       = "platform-team"
   CostCenter  = "engineering"
 }
