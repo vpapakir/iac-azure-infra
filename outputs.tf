@@ -3,7 +3,7 @@ output "resource_group_gen_location" {
   value       = module.resourcegroup_gen.location
 }
 
-output "resource_group_api_location" {
+output "resource_group_intg_location" {
   description = "Location of the created resource group"
-  value       = module.resourcegroup_api.location
+  value       = module.resourcegroup_intg.location
 }

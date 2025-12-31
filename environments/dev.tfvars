@@ -1,7 +1,7 @@
-resource_group_name_api = "rg-weu-dev-api-001"
-location_api            = "West Europe"
+resource_group_name_intg = "rg-weu-dev-intg-001"
+location_intg            = "West Europe"
 
-tags_api = {
+tags_intg = {
   Environment = "dev"
   Project     = "api"
   Owner       = "platform-team"

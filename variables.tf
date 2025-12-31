@@ -1,15 +1,15 @@
-variable "resource_group_name_api" {
+variable "resource_group_name_intg" {
   description = "Name of the Azure resource group"
   type        = string
 }
 
-variable "location_api" {
+variable "location_intg" {
   description = "Azure region for resources"
   type        = string
   default     = "West Europe"
 }
 
-variable "tags_api" {
+variable "tags_intg" {
   description = "Tags to apply to all resources"
   type        = map(string)
   default     = {}
