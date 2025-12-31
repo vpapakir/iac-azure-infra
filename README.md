@@ -1,6 +1,6 @@
 # iac-azure-infra
 
-Azure infrastructure consumer repository implementing multi-environment deployment using published atoms from the atom-molecule-template architecture.
+Azure infrastructure consumer repository implementing multi-environment deployment using published atoms from the atom-molecule-template architecture...
 
 ## Traffic Light System
 
