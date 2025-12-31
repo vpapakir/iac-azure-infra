@@ -10,7 +10,7 @@ module "resourcegroup" {
   source  = "app.terraform.io/vpapakir/resourcegroup/atom"
   version = "0.0.1"
 
-  name = var.resource_group_name
+  name     = var.resource_group_name
   location = var.location
   tags     = var.tags
 }
