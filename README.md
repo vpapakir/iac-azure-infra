@@ -88,7 +88,7 @@ iac-azure-infra/
 git commit -m "[github] [azure] [ado] feat: update resource group configuration"
 git push origin feature-branch
 ```
-**Result**: Pipeline runs plan stage only, shows what would change
+**Result**: Pipeline runs plan stage only and shows what would change
 
 ### Applying Changes (Intentional)
 ```bash
