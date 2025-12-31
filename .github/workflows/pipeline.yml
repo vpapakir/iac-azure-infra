@@ -1,0 +1,120 @@
+name: Azure Infrastructure Pipeline
+
+on:
+  push:
+    branches: ['*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  commit-check:
+    runs-on: ubuntu-latest
+    outputs:
+      should-run: ${{ steps.check.outputs.should-run }}
+      should-apply: ${{ steps.check.outputs.should-apply }}
+    steps:
+    - name: Parse commit message
+      id: check
+      run: |
+        COMMIT_MSG="${{ github.event.head_commit.message || github.event.pull_request.title }}"
+        if [[ "$COMMIT_MSG" == *"[gh_actions]"* ]] || [[ "$COMMIT_MSG" == *"[azure]"* ]]; then
+          echo "should-run=true" >> $GITHUB_OUTPUT
+        else
+          echo "should-run=false" >> $GITHUB_OUTPUT
+        fi
+        
+        if [[ "$COMMIT_MSG" == *"[apply]"* ]]; then
+          echo "should-apply=true" >> $GITHUB_OUTPUT
+        else
+          echo "should-apply=false" >> $GITHUB_OUTPUT
+        fi
+
+  plan:
+    needs: commit-check
+    if: needs.commit-check.outputs.should-run == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, staging, prod]
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+        cli_config_credentials_token: ${{ secrets.TF_CLOUD_TOKEN }}
+    
+    - name: Plan ${{ matrix.environment }}
+      run: |
+        terraform init -backend-config=backend-configs/${{ matrix.environment }}.hcl
+        terraform plan -var-file=environments/${{ matrix.environment }}.tfvars
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+  dev:
+    needs: [commit-check, plan]
+    if: needs.commit-check.outputs.should-apply == 'true'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+        cli_config_credentials_token: ${{ secrets.TF_CLOUD_TOKEN }}
+    
+    - name: Apply Dev
+      run: |
+        terraform init -backend-config=backend-configs/dev.hcl
+        terraform apply -var-file=environments/dev.tfvars -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+  staging:
+    needs: [commit-check, dev]
+    if: needs.commit-check.outputs.should-apply == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+        cli_config_credentials_token: ${{ secrets.TF_CLOUD_TOKEN }}
+    
+    - name: Apply Staging
+      run: |
+        terraform init -backend-config=backend-configs/staging.hcl
+        terraform apply -var-file=environments/staging.tfvars -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+
+  prod:
+    needs: [commit-check, staging]
+    if: needs.commit-check.outputs.should-apply == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: actions/checkout@v4
+    - uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.6.0
+        cli_config_credentials_token: ${{ secrets.TF_CLOUD_TOKEN }}
+    
+    - name: Apply Production
+      run: |
+        terraform init -backend-config=backend-configs/prod.hcl
+        terraform apply -var-file=environments/prod.tfvars -auto-approve
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
