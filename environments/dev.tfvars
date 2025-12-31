@@ -3,7 +3,7 @@ location_intg            = "West Europe"
 
 tags_intg = {
   Environment = "dev"
-  Project     = "api"
+  Project     = "intg"
   Owner       = "platform-team"
   CostCenter  = "engineering"
 }
