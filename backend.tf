@@ -6,10 +6,10 @@ terraform {
       version = "~> 3.0"
     }
   }
-  
+
   backend "remote" {
     organization = "vpapakir"
-    
+
     workspaces {
       prefix = "azure-infra-"
     }
