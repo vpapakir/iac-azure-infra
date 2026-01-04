@@ -2,10 +2,9 @@
 output "gen" {
   description = "General resource group details"
   value = {
-    id       = module.resourcegroup_gen.id
-    name     = module.resourcegroup_gen.name
+    id       = module.resourcegroup_gen.resource_group_id
+    name     = module.resourcegroup_gen.resource_group_name
     location = module.resourcegroup_gen.location
-    tags     = module.resourcegroup_gen.tags
   }
 }
 
@@ -13,10 +12,9 @@ output "gen" {
 output "intg" {
   description = "Integration resource group details"
   value = {
-    id       = module.resourcegroup_intg.id
-    name     = module.resourcegroup_intg.name
+    id       = module.resourcegroup_intg.resource_group_id
+    name     = module.resourcegroup_intg.resource_group_name
     location = module.resourcegroup_intg.location
-    tags     = module.resourcegroup_intg.tags
   }
 }
 
@@ -25,13 +23,13 @@ output "resource_groups" {
   description = "All resource groups for cross-referencing"
   value = {
     gen = {
-      id       = module.resourcegroup_gen.id
-      name     = module.resourcegroup_gen.name
+      id       = module.resourcegroup_gen.resource_group_id
+      name     = module.resourcegroup_gen.resource_group_name
       location = module.resourcegroup_gen.location
     }
     intg = {
-      id       = module.resourcegroup_intg.id
-      name     = module.resourcegroup_intg.name
+      id       = module.resourcegroup_intg.resource_group_id
+      name     = module.resourcegroup_intg.resource_group_name
       location = module.resourcegroup_intg.location
     }
   }
