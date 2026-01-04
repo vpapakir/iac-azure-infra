@@ -9,7 +9,7 @@ This repository implements the **traffic light system** for CI/CD pipeline contr
 ### Commit Message Convention
 
 ```
-[github] [azure] [ci-tool] [action] <description-free-text-message>
+[github] [azure] [ci-tool] [action] <description-free-text-here>
 ```
 
 **Examples:**
