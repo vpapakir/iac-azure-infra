@@ -24,8 +24,24 @@ git commit -m "[github] [azure] [gh_actions] [build] feat: add data factory modu
 ## Architecture
 
 This repository consumes published atoms from Terraform Cloud registry:
-- **Resource Group Atom**: `app.terraform.io/vpapakir/resourcegroup/atom` v0.0.1
+- **Resource Group Atom**: `app.terraform.io/vpapakir/resourcegroup/atom` v0.0.2
 - **Data Factory Atom**: `app.terraform.io/vpapakir/datafactory/azure` (planned)
+
+### YAML-Driven Configuration
+- **Configuration**: Defined in `config/dev.yaml` with structured data
+- **Naming Convention**: Strict Azure CAF compliant naming (`rg-weu-dev-{purpose}-001`)
+- **Resource Processing**: YAML decoded with `yamldecode()` and processed through Terraform locals
+- **Tag Merging**: Common tags merged with resource-specific tags
+
+### Current Resource Groups (8 total)
+- `rg-weu-dev-gen-001` - General resources
+- `rg-weu-dev-shared-001` - Shared infrastructure
+- `rg-weu-dev-api-001` - API services
+- `rg-weu-dev-sqldb-001` - SQL databases
+- `rg-weu-dev-dataintg-001` - Data integration
+- `rg-weu-dev-datalake-001` - Data lake
+- `rg-weu-dev-datalakestorage-001` - Data lake storage
+- `rg-weu-dev-manageddbx-001` - Managed Databricks
 
 ### Execution Model
 - **Remote Execution**: Terraform runs in Terraform Cloud
@@ -44,7 +60,10 @@ iac-azure-infra/
 ├── imports.tf                 # Resource import blocks
 ├── variables.tf               # Input variables
 ├── outputs.tf                 # Resource outputs
-├── dev.auto.tfvars           # Auto-loaded dev configuration
+├── config/
+│   └── dev.yaml               # YAML configuration with resource definitions
+├── naming.tf                  # Naming convention system
+├── config.tf                  # YAML processing with yamldecode()
 ├── .azure/pipeline.yml        # Azure DevOps pipeline
 └── .github/workflows/         # GitHub Actions workflows
     └── pipeline.yml          # Multi-environment deployment
