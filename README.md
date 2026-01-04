@@ -39,7 +39,9 @@ This repository consumes published atoms from Terraform Cloud registry:
 iac-azure-infra/
 ├── backend.tf                 # Terraform Cloud remote backend
 ├── providers.tf               # Azure provider configuration
-├── main.tf                    # Core infrastructure using atoms
+├── 01.main-gen.tf             # General resource group
+├── 02.main-intg.tf            # Integration resource group
+├── imports.tf                 # Resource import blocks
 ├── variables.tf               # Input variables
 ├── outputs.tf                 # Resource outputs
 ├── dev.auto.tfvars           # Auto-loaded dev configuration
@@ -91,20 +93,54 @@ git push origin main
 
 ## Environment Configuration
 
-### Development (`environments/dev.tfvars`)
-- Public network access enabled
-- Basic security settings
-- Cost-optimized resources
+### Development (`dev.auto.tfvars`)
+- **General RG**: `rg-weu-dev-gen-001` in West Europe
+- **Integration RG**: `rg-weu-dev-intg-001` in West Europe
+- Auto-loaded by Terraform Cloud remote execution
+- Environment: dev, Project: gen/intg, Owner: platform team
 
-### Staging (`environments/staging.tfvars`)
-- Private network access
-- Production-like security
-- Scaled-down resources
+## Outputs
 
-### Production (`environments/prod.tfvars`)
-- Private network access
-- Maximum security hardening
-- Full-scale resources
+The infrastructure exposes hierarchical outputs for easy consumption:
+
+```hcl
+# Individual resource group outputs
+output "gen" {
+  value = {
+    id       = "resource-group-id"
+    name     = "rg-weu-dev-gen-001"
+    location = "West Europe"
+    tags     = { Environment = "dev", Project = "gen" }
+  }
+}
+
+output "intg" {
+  value = {
+    id       = "resource-group-id"
+    name     = "rg-weu-dev-intg-001"
+    location = "West Europe"
+    tags     = { Environment = "dev", Project = "intg" }
+  }
+}
+
+# Cross-reference helper for other modules
+output "resource_groups" {
+  value = {
+    gen  = { id = "...", name = "...", location = "..." }
+    intg = { id = "...", name = "...", location = "..." }
+  }
+}
+```
+
+**Usage in other modules:**
+```hcl
+# Reference specific resource group
+resource_group_name = data.terraform_remote_state.infra.outputs.gen.name
+location = data.terraform_remote_state.infra.outputs.intg.location
+
+# Use cross-reference helper
+resource_group_id = data.terraform_remote_state.infra.outputs.resource_groups.gen.id
+```
 
 ## Required Configuration
 

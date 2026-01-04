@@ -17,7 +17,7 @@ jobs:
       id: check
       run: |
         COMMIT_MSG="${{ github.event.head_commit.message || github.event.pull_request.title }}"
-        if [[ "$COMMIT_MSG" == *"[gh_actions]"* ]] || [[ "$COMMIT_MSG" == *"[azure]"* ]]; then
+        if [[ "$COMMIT_MSG" == *"[gh_actions]"* ]]; then
           echo "should-run=true" >> $GITHUB_OUTPUT
         else
           echo "should-run=false" >> $GITHUB_OUTPUT
