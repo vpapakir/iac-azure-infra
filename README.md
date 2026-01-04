@@ -1,6 +1,6 @@
 # iac-azure-infra
 
-Azure infrastructure consumer repository implementing multi-environment deployment using published atoms from the atom-molecule-template architecture...
+Azure infrastructure consumer repository implementing multi-environment deployment using published atoms from the atom-molecule-template architecture.
 
 ## Traffic Light System
 
@@ -9,7 +9,7 @@ This repository implements the **traffic light system** for CI/CD pipeline contr
 ### Commit Message Convention
 
 ```
-[github] [azure] [ci-tool] [action] <description>
+[github] [azure] [ci-tool] [action] <description-free-text-here>
 ```
 
 **Examples:**
@@ -24,61 +24,46 @@ git commit -m "[github] [azure] [gh_actions] [build] feat: add data factory modu
 ## Architecture
 
 This repository consumes published atoms from Terraform Cloud registry:
-- **Resource Group Atom**: `app.terraform.io/vpapakir/resourcegroup/azure`
-- **Data Factory Atom**: `app.terraform.io/vpapakir/datafactory/azure` (when available)
+- **Resource Group Atom**: `app.terraform.io/vpapakir/resourcegroup/atom` v0.0.1
+- **Data Factory Atom**: `app.terraform.io/vpapakir/datafactory/azure` (planned)
+
+### Execution Model
+- **Remote Execution**: Terraform runs in Terraform Cloud
+- **Remote State**: State stored in Terraform Cloud workspaces
+- **VCS Integration**: Repository connected to Terraform Cloud for automatic runs
+- **Authentication**: Azure credentials configured in Terraform Cloud workspace variables
 
 ## Multi-Environment Structure
 
 ```
 iac-azure-infra/
-├── main.tf                    # Core infrastructure using atoms
+├── backend.tf                 # Terraform Cloud remote backend
+├── providers.tf               # Azure provider configuration
+├── 01.main-gen.tf             # General resource group
+├── 02.main-intg.tf            # Integration resource group
+├── imports.tf                 # Resource import blocks
 ├── variables.tf               # Input variables
 ├── outputs.tf                 # Resource outputs
-├── environments/              # Environment-specific configurations
-│   ├── dev.tfvars            # Development settings
-│   ├── staging.tfvars        # Staging settings
-│   └── prod.tfvars           # Production settings
-├── backend-configs/           # Terraform Cloud workspace configs
-│   ├── dev.hcl               # Dev workspace
-│   ├── staging.hcl           # Staging workspace
-│   └── prod.hcl              # Production workspace
-├── .azure/pipeline.yml        # Azure DevOps multi-stage pipeline
+├── dev.auto.tfvars           # Auto-loaded dev configuration
+├── .azure/pipeline.yml        # Azure DevOps pipeline
 └── .github/workflows/         # GitHub Actions workflows
     └── pipeline.yml          # Multi-environment deployment
 ```
 
-## Pipeline Stages
+## Pipeline Behavior
 
-### Development
-- **Trigger**: All commits and PRs
-- **Environment**: `dev`
-- **Workspace**: `azure-infra-dev`
-- **Auto-deploy**: Yes
+### Planning (Every Push)
+- **Trigger**: All commits to any branch
+- **Execution**: Terraform Cloud remote execution
+- **Result**: Shows infrastructure changes, exits successfully
+- **No Apply Prompt**: Uses `terraform plan -detailed-exitcode`
 
-### Staging
-- **Trigger**: Main branch only
-- **Environment**: `staging`
-- **Workspace**: `azure-infra-staging`
-- **Depends on**: Dev deployment success
-
-### Production
-- **Trigger**: Main branch only
-- **Environment**: `production`
-- **Workspace**: `azure-infra-prod`
-- **Depends on**: Staging deployment success
-- **Requires**: Manual approval
-
-## Pipeline Stages
-
-### Planning (All Environments)
-- **Trigger**: Every push
-- **Environments**: Dev, staging, prod
-- **Shows**: What would change in each environment
-
-### Apply Rules
-- **Dev**: Any branch with `[apply]`
-- **Staging/Prod**: Main branch only with `[apply]`
-- **Requires**: Manual approval for production
+### Applying (Intentional Only)
+- **Trigger**: Commits containing `[apply]` in message
+- **Execution**: Terraform Cloud remote execution
+- **Result**: Actually deploys infrastructure changes
+- **Dev Environment**: Currently active
+- **Staging/Prod**: Disabled (condition: false)
 
 ## Usage
 
@@ -88,7 +73,7 @@ iac-azure-infra/
 git commit -m "[github] [azure] [ado] feat: update resource group configuration"
 git push origin feature-branch
 ```
-**Result**: Pipeline runs plan stage only and shows what would change
+**Result**: Pipeline runs plan stage only and shows what would change..
 
 ### Applying Changes (Intentional)
 ```bash
@@ -108,35 +93,69 @@ git push origin main
 
 ## Environment Configuration
 
-### Development (`environments/dev.tfvars`)
-- Public network access enabled
-- Basic security settings
-- Cost-optimized resources
+### Development (`dev.auto.tfvars`)
+- **General RG**: `rg-weu-dev-gen-001` in West Europe
+- **Integration RG**: `rg-weu-dev-intg-001` in West Europe
+- Auto-loaded by Terraform Cloud remote execution
+- Environment: dev, Project: gen/intg, Owner: platform team
 
-### Staging (`environments/staging.tfvars`)
-- Private network access
-- Production-like security
-- Scaled-down resources
+## Outputs
 
-### Production (`environments/prod.tfvars`)
-- Private network access
-- Maximum security hardening
-- Full-scale resources
+The infrastructure exposes hierarchical outputs for easy consumption:
 
-## Required Secrets
+```hcl
+# Individual resource group outputs
+output "gen" {
+  value = {
+    id       = "resource-group-id"
+    name     = "rg-weu-dev-gen-001"
+    location = "West Europe"
+  }
+}
+
+output "intg" {
+  value = {
+    id       = "resource-group-id"
+    name     = "rg-weu-dev-intg-001"
+    location = "West Europe"
+  }
+}
+
+# Cross-reference helper for other modules
+output "resource_groups" {
+  value = {
+    gen  = { id = "...", name = "...", location = "..." }
+    intg = { id = "...", name = "...", location = "..." }
+  }
+}
+```
+
+**Usage in other modules:**
+```hcl
+# Reference specific resource group
+resource_group_name = data.terraform_remote_state.infra.outputs.gen.name
+location = data.terraform_remote_state.infra.outputs.intg.location
+
+# Use cross-reference helper
+resource_group_id = data.terraform_remote_state.infra.outputs.resource_groups.gen.id
+```
+
+## Required Configuration
+
+### Terraform Cloud Workspace
+**Workspace**: `azure-infra-dev`
+**VCS Connection**: Connected to GitHub repository
+**Environment Variables**:
+- `ARM_CLIENT_ID` - Azure Service Principal ID
+- `ARM_CLIENT_SECRET` - Azure Service Principal Secret (sensitive)
+- `ARM_SUBSCRIPTION_ID` - Azure Subscription ID
+- `ARM_TENANT_ID` - Azure Tenant ID
 
 ### Azure DevOps Variable Groups
 **`terraform` Variable Group:**
 - `apiKey` - Terraform Cloud API token
 
 **`shared` Variable Group:**
-- `ARM_CLIENT_ID` - Azure Service Principal ID
-- `ARM_CLIENT_SECRET` - Azure Service Principal Secret
-- `ARM_SUBSCRIPTION_ID` - Azure Subscription ID
-- `ARM_TENANT_ID` - Azure Tenant ID
-
-### GitHub Actions Secrets
-- `TF_CLOUD_TOKEN` - Terraform Cloud API token
 - `ARM_CLIENT_ID` - Azure Service Principal ID
 - `ARM_CLIENT_SECRET` - Azure Service Principal Secret
 - `ARM_SUBSCRIPTION_ID` - Azure Subscription ID
