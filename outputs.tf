@@ -68,16 +68,6 @@ output "datalakestorage" {
   }
 }
 
-# Managed Databricks Resource Group Outputs
-output "manageddbx" {
-  description = "Managed Databricks resource group details"
-  value = {
-    id       = module.resourcegroup_manageddbx.resource_group_id
-    name     = module.resourcegroup_manageddbx.resource_group_name
-    location = module.resourcegroup_manageddbx.location
-  }
-}
-
 # Cross-reference outputs for other modules
 output "resource_groups" {
   description = "All resource groups for cross-referencing"
@@ -116,11 +106,6 @@ output "resource_groups" {
       id       = module.resourcegroup_datalakestorage.resource_group_id
       name     = module.resourcegroup_datalakestorage.resource_group_name
       location = module.resourcegroup_datalakestorage.location
-    }
-    manageddbx = {
-      id       = module.resourcegroup_manageddbx.resource_group_id
-      name     = module.resourcegroup_manageddbx.resource_group_name
-      location = module.resourcegroup_manageddbx.location
     }
   }
 }
