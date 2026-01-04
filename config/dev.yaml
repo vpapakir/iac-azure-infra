@@ -7,7 +7,7 @@ common_tags:
   CostCenter: engineering
 
 resource_groups:
-  - purpose: general
+  - purpose: gen
     instance: 1
     tags:
       Project: gen
@@ -35,10 +35,6 @@ resource_groups:
     instance: 1
     tags:
       Project: datalakestorage
-  - purpose: logicapp
-    instance: 1
-    tags:
-      Project: logicapp
   - purpose: manageddbx
     instance: 1
     tags:

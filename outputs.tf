@@ -68,16 +68,6 @@ output "datalakestorage" {
   }
 }
 
-# Logic App Resource Group Outputs
-output "logicapp" {
-  description = "Logic App resource group details"
-  value = {
-    id       = module.resourcegroup_logicapp.resource_group_id
-    name     = module.resourcegroup_logicapp.resource_group_name
-    location = module.resourcegroup_logicapp.location
-  }
-}
-
 # Managed Databricks Resource Group Outputs
 output "manageddbx" {
   description = "Managed Databricks resource group details"
@@ -126,11 +116,6 @@ output "resource_groups" {
       id       = module.resourcegroup_datalakestorage.resource_group_id
       name     = module.resourcegroup_datalakestorage.resource_group_name
       location = module.resourcegroup_datalakestorage.location
-    }
-    logicapp = {
-      id       = module.resourcegroup_logicapp.resource_group_id
-      name     = module.resourcegroup_logicapp.resource_group_name
-      location = module.resourcegroup_logicapp.location
     }
     manageddbx = {
       id       = module.resourcegroup_manageddbx.resource_group_id

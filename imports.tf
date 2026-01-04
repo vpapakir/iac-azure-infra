@@ -39,11 +39,6 @@ import {
 }
 
 import {
-  to = module.resourcegroup_logicapp.azurerm_resource_group.main
-  id = "/subscriptions/52ce15a5-9158-46b9-ab49-2b932ed43df9/resourceGroups/rg-weu-dev-logicapp-001"
-}
-
-import {
   to = module.resourcegroup_manageddbx.azurerm_resource_group.main
   id = "/subscriptions/52ce15a5-9158-46b9-ab49-2b932ed43df9/resourceGroups/rg-weu-dev-manageddbx-001"
 }
