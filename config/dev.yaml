@@ -35,3 +35,7 @@ resource_groups:
     instance: 1
     tags:
       Project: datalakestorage
+  - purpose: manageddbx
+    instance: 1
+    tags:
+      Project: manageddbx
