@@ -33,9 +33,6 @@ jobs:
     needs: commit-check
     if: needs.commit-check.outputs.should-run == 'true'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: [dev, staging, prod]
     steps:
     - uses: actions/checkout@v4
     - uses: hashicorp/setup-terraform@v3
@@ -43,15 +40,21 @@ jobs:
         terraform_version: 1.6.0
         cli_config_credentials_token: ${{ secrets.TF_CLOUD_TOKEN }}
     
-    - name: Plan ${{ matrix.environment }}
+    - name: Plan Dev
       run: |
-        terraform init -backend-config=backend-configs/${{ matrix.environment }}.hcl
-        terraform plan -var-file=environments/${{ matrix.environment }}.tfvars
+        terraform init -reconfigure
+        terraform plan -detailed-exitcode
+        PLAN_EXIT_CODE=$?
+        if [ $PLAN_EXIT_CODE -eq 0 ]; then
+          echo "✅ No changes detected"
+        elif [ $PLAN_EXIT_CODE -eq 2 ]; then
+          echo "✅ Changes detected - plan successful"
+        else
+          echo "❌ Plan failed"
+          exit $PLAN_EXIT_CODE
+        fi
       env:
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_WORKSPACE: azure-infra-dev
 
   dev:
     needs: [commit-check, plan]
@@ -67,17 +70,14 @@ jobs:
     
     - name: Apply Dev
       run: |
-        terraform init -backend-config=backend-configs/dev.hcl
-        terraform apply -var-file=environments/dev.tfvars -auto-approve
+        terraform init
+        terraform apply -auto-approve
       env:
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_WORKSPACE: azure-infra-dev
 
   staging:
     needs: [commit-check, dev]
-    if: needs.commit-check.outputs.should-apply == 'true' && github.ref == 'refs/heads/main'
+    if: false
     runs-on: ubuntu-latest
     environment: staging
     steps:
@@ -89,17 +89,14 @@ jobs:
     
     - name: Apply Staging
       run: |
-        terraform init -backend-config=backend-configs/staging.hcl
-        terraform apply -var-file=environments/staging.tfvars -auto-approve
+        terraform init
+        terraform apply -auto-approve
       env:
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_WORKSPACE: azure-infra-staging
 
   prod:
     needs: [commit-check, staging]
-    if: needs.commit-check.outputs.should-apply == 'true' && github.ref == 'refs/heads/main'
+    if: false
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -111,10 +108,7 @@ jobs:
     
     - name: Apply Production
       run: |
-        terraform init -backend-config=backend-configs/prod.hcl
-        terraform apply -var-file=environments/prod.tfvars -auto-approve
+        terraform init
+        terraform apply -auto-approve
       env:
-        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        TF_WORKSPACE: azure-infra-prod
