@@ -50,20 +50,25 @@ iac-azure-infra/
     └── pipeline.yml          # Multi-environment deployment
 ```
 
-## Pipeline Behavior
+## Pipeline Configuration
 
-### Planning (Every Push)
-- **Trigger**: All commits to any branch
-- **Execution**: Terraform Cloud remote execution
-- **Result**: Shows infrastructure changes, exits successfully
-- **No Apply Prompt**: Uses `terraform plan -detailed-exitcode`
+### Centralized Pipeline Templates
+Pipeline templates are sourced from the centralized `iac-pipeline-templates` repository:
+- **Template Repository**: https://github.com/vpapakir/iac-pipeline-templates
+- **Current Version**: Latest release
+- **Infrastructure-Specific**: Optimized for infrastructure consumption patterns
 
-### Applying (Intentional Only)
-- **Trigger**: Commits containing `[apply]` in message
-- **Execution**: Terraform Cloud remote execution
-- **Result**: Actually deploys infrastructure changes
-- **Dev Environment**: Currently active
-- **Staging/Prod**: Disabled (condition: false)
+### Azure DevOps (`.azure/pipeline.yml`)
+- **Template**: `azure/stages/infrastructure-pipeline.yml@templates`
+- **Parameters**: ciTool: 'ado', workspacePrefix: 'azure-infra', terraformVersion: '1.14.0'
+- **Variable Groups**: `terraform` (TF_CLOUD_TOKEN), `shared` (Azure credentials)
+- **Stages**: CommitCheck → Plan → Apply
+
+### GitHub Actions (`.github/workflows/pipeline.yml`)
+- **Workflow**: `vpapakir/iac-pipeline-templates/.github/workflows/infrastructure-pipeline.yml@main`
+- **Inputs**: ci-tool: 'gh_actions', workspace-prefix: 'azure-infra'
+- **Secrets**: `TF_CLOUD_TOKEN`
+- **Jobs**: commit-check → plan → apply
 
 ## Usage
 
