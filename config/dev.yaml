@@ -1,0 +1,45 @@
+environment: dev
+location: West Europe
+
+common_tags:
+  Environment: dev
+  Owner: platform-team
+  CostCenter: engineering
+
+resource_groups:
+  - purpose: general
+    instance: 1
+    tags:
+      Project: gen
+  - purpose: shared
+    instance: 1
+    tags:
+      Project: shared
+  - purpose: api
+    instance: 1
+    tags:
+      Project: api
+  - purpose: sqldb
+    instance: 1
+    tags:
+      Project: sqldb
+  - purpose: dataintg
+    instance: 1
+    tags:
+      Project: dataintg
+  - purpose: datalake
+    instance: 1
+    tags:
+      Project: datalake
+  - purpose: datalakestorage
+    instance: 1
+    tags:
+      Project: datalakestorage
+  - purpose: logicapp
+    instance: 1
+    tags:
+      Project: logicapp
+  - purpose: manageddbx
+    instance: 1
+    tags:
+      Project: manageddbx
