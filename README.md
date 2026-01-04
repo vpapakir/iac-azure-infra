@@ -110,7 +110,6 @@ output "gen" {
     id       = "resource-group-id"
     name     = "rg-weu-dev-gen-001"
     location = "West Europe"
-    tags     = { Environment = "dev", Project = "gen" }
   }
 }
 
@@ -119,7 +118,6 @@ output "intg" {
     id       = "resource-group-id"
     name     = "rg-weu-dev-intg-001"
     location = "West Europe"
-    tags     = { Environment = "dev", Project = "intg" }
   }
 }
 
